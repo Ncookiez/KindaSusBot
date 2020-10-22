@@ -14,22 +14,34 @@ const db_host = '65.19.141.67';
 const db_user = 'ncookie_ncookie';
 const db_name = 'ncookie_KindaSusDB';
 
-// Connecting to MySQL:
-var con = mysql.createConnection({
-    host: db_host,
-    user: db_user,
-    password: process.env.DB_PASS,
-    database: db_name
-});
-con.connect(function(err) {
-    if(err) throw err;
-    console.log('MySQL is looking kinda sus.');
-});
+// MySQL Connection Setup:
+function dbConnect() {
 
-// Startup Message:
-client.once('ready', () => {
-    console.log('KindaSusBot is ready to snap some necks.');
-});
+    // Creating Connection:
+    var con = mysql.createConnection({
+        host: db_host,
+        user: db_user,
+        password: process.env.DB_PASS,
+        database: db_name
+    });
+    
+    // Connecting:
+    con.connect(function(err) {
+        if(err) throw err;
+        console.log('MySQL is looking kinda sus.');
+    });
+    
+    // Handling Idle Timeouts:
+    connection.on('error', function(err) {
+        if(err.code === 'PROTOCOL_CONNECTION_LOST') {
+            console.log('MySQL connection dropped. Attempting to reconnect...');
+            dbConnect();
+        } else {
+            throw err;
+        }
+    });
+}
+dbConnect();
 
 //====================================================================================================//
 //                                            BOT COMMANDS                                            //
