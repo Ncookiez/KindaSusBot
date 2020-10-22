@@ -41,11 +41,11 @@ function dbConnect() {
         }
     });
 }
-dbConnect();
 
 // Startup Message:
 client.once('ready', () => {
     console.log('KindaSusBot is ready to snap some necks.');
+    dbConnect();
 });
 
 //====================================================================================================//
