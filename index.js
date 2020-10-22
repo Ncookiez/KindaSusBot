@@ -40,7 +40,6 @@ client.on('message', message => {
 
     // MySQL query to add to database:
     function join(discordID, username) {
-        var crewSize;
         var sql = "SELECT discordID FROM players WHERE discordID = '" + discordID + "'";
         con.query(sql, function(err, result) {
             if(err) throw err;
@@ -51,15 +50,19 @@ client.on('message', message => {
                 sql = "INSERT INTO players (discordID, username) VALUES ('" + discordID + "', '" + username + "')";
                 con.query(sql, function(err) {
                     if(err) throw err;
-                    var sql = "SELECT * FROM players";
+                    var sql = "SELECT * FROM players";  
                     con.query(sql, function(err, result) {
                         if(err) throw err;
-                        crewSize = result.length;
+                        var crewSize = result.length;
+                        if(crewSize == 10) {
+                            message.channel.send(':rocket: Our spaceship is full and ready to launch! :rocket:');
+                        } else if(crewSize == 6) {
+                            message.channel.send(':rocket: @everyone There are at least 6 "crewmates" ready to launch. Anyone else wanting to join? :rocket:');
+                        }
                     });
                 });
             }
         });
-        return crewSize;
     }
 
     // MySQL query to delete from database:
@@ -81,7 +84,7 @@ client.on('message', message => {
         con.query(sql, function(err, result) {
             if(err) throw err;
             if(result.length) {
-                var crewmates = ':rocket: Current "crewmates" aboard:\n';
+                var crewmates = ':rocket: Current "crewmates" aboard (' + result.length + '):\n';
                 for(var i = 0; i < result.length; i++) {
                     crewmates += '> ' + result[i].username + '\n';
                 }
@@ -112,12 +115,7 @@ client.on('message', message => {
 
     // Command: '!join':
     if(command === 'join') {
-        var crewSize = join(message.author.id, message.author.username);
-        if(crewSize == 10) {
-            message.channel.send(':rocket: Our spaceship is full and ready to launch! :rocket:');
-        } else if(crewSize == 6) {
-            message.channel.send(':rocket: @everyone There are at least 6 "crewmates" ready to launch. Anyone else wanting to join? :rocket:');
-        }
+        join(message.author.id, message.author.username);
         return;
     }
 
