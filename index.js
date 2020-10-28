@@ -121,6 +121,19 @@ client.on('message', message => {
         });
     }
 
+    // MySQL query to delete one row from database:
+    function kick(username) {
+        var sql = "DELETE FROM players WHERE username = '" + username + "'";
+        con.query(sql, function(err, result) {
+            if(err) throw err;
+            if(result.affectedRows) {
+                message.channel.send(':dash: ' + username + ' was mercilessly thrown into the void of space. :dash:');
+            } else {
+                message.channel.send(':x: No such crewmate was found! :x:');
+            }
+        });
+    }
+
     // Generic message checks:
     if(message.author.bot || !message.content.toLowerCase().includes(key)) {
         return;
@@ -157,6 +170,13 @@ client.on('message', message => {
     // Command: '!crew':
     if(command === 'crew') {
         crew();
+        return;
+    }
+
+    // Command: '!kick':
+    if(command.includes('kick')) {
+        var playerName = command.split(' ')[1];
+        kick(playerName);
         return;
     }
 
